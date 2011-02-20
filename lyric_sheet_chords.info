@@ -1,0 +1,6 @@
+; $Id$
+name = Lyric Sheet Chords
+description = Input filter for chords on a lyric sheet
+package = Other
+version = 1.0
+core = 6.x

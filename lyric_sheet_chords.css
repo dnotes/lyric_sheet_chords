@@ -1,0 +1,20 @@
+/* $Id$ */
+
+span.chord {
+  height: 2em;
+  display: inline-block;
+  position: relative;
+}
+
+span.chord span {
+  display:none;
+}
+
+span.chord span.chord-text {
+  font-size: smaller;
+  font-weight: bold;
+  color: green;
+  position: absolute;
+  display:block;
+}
+

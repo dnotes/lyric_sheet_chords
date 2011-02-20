@@ -1,0 +1,45 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ *
+ */
+
+/**
+ * Implementation of hook_filter().
+ */
+function lyric_sheet_chords_filter($op, $delta = 0, $format = -1, $text = '') {
+  switch ($op) {
+    case 'list':
+      return array(0 => t('Chord filter'));
+    case 'description':
+      return t('Substitutes chord tags such as "[C]" with a nicely formatted chord marking.');
+    case 'prepare':
+      return $text;
+    case 'process':
+      drupal_add_css(drupal_get_path('module', 'lyric_sheet_chords') . '/lyric_sheet_chords.css');
+      return preg_replace("|\[([A-G][-\+MADSmajinorsudimg /#b1-9]*/*[A-G1-9]*)\]|", '<span class="chord"><span> [</span><span class="chord-text">$1</span><span>] </span></span>', $text);
+  }
+}
+
+/**
+ * Implementation of hook_filter_tips().
+ */
+function lyric_sheet_chords_filter_tips($delta, $format, $long = FALSE) {
+  if ($long) {
+    return t('Always begin the chord with a capital letter A-G.  Use # for sharp and b for flat.  If you have a bass note, put it at the end of the chord after a slash.  The following are a few chord types that are recognized: <ul>
+      <li>[Am7] = A minor 7</li>
+      <li>[Cmaj7] = C major 7</li>
+      <li>[F#13] = F sharp 13</li>
+      <li>[Dsus4] = D suspended 4</li>
+      <li>[C/G] = C over G (G as bass)</li>
+      <li>[Cmaj/min7] = C major minor 7</li>
+      <li>[GMaj7b13] = G major 7 flat 13</li>
+      </ul>');
+  }
+  else {
+    return t('To get nicely formatted chords, enclose the chord in brackets, like: [C], [F], [Amin7], [Dsus4], etc.');
+  }
+}
+
