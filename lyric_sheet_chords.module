@@ -15,11 +15,30 @@ function lyric_sheet_chords_filter($op, $delta = 0, $format = -1, $text = '') {
       return array(0 => t('Chord filter'));
     case 'description':
       return t('Substitutes chord tags such as "[C]" with a nicely formatted chord marking.');
+    case 'no cache':
+      return FALSE;
     case 'prepare':
       return $text;
+    case 'settings':
+      $form['lyric_sheet_chords_copy'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Copy chords with text'),
+        '#description' => t('When copying text from the browser, the chords will appear inline with the text.
+          The benefit of this is that the chords are kept, but in many cases they do not make sense in context, for example
+          when a chord appears in the middle of a word.  Also, copying from webkit browsers can be wonky.'),
+        '#default_value' => variable_get('lyric_sheet_chords_copy', FALSE),
+      );
+      return $form;
     case 'process':
       drupal_add_css(drupal_get_path('module', 'lyric_sheet_chords') . '/lyric_sheet_chords.css');
-      return preg_replace("|\[([A-G][-\+MADSmajinorsudimg /#b1-9]*/*[A-G1-9]*)\]|", '<span class="chord"><span> [</span><span class="chord-text">$1</span><span>] </span></span>', $text);
+      if (variable_get('lyric_sheet_chords_copy', FALSE)) {
+        return preg_replace("|\[([A-G][-\+MADSmajinorsudimg /#b1-9]*/*[A-G1-9]*)\]|", '<span class="chord"><span> [</span><span class="chord-text">$1</span><span>] </span></span>', $text);
+      }
+      else {
+        return _lyric_sheet_chords_render($text);
+      }
+    default:
+      return $text;
   }
 }
 
@@ -43,3 +62,24 @@ function lyric_sheet_chords_filter_tips($delta, $format, $long = FALSE) {
   }
 }
 
+function _lyric_sheet_chords_render($text) {
+  $matches = array();
+  if (preg_match_all("|\[([A-G][-\+MADSmajinorsudimg /#b1-9]*/*[A-G1-9]*)\]|", $text, $matches)) {
+    foreach ($matches[0] as $i => $match) {
+      $chords[$match] = $matches[1][$i];
+    }
+    foreach ($chords as $markup => $chord) {
+      $class = str_replace('-', 'minus', $chord);
+      $class = str_replace('plus', 'plus', $class);
+      $class = str_replace('#', 'sharp', $class);
+      $class = str_replace('/', 'over', $class);
+      $class = str_replace(' ', '', $class);
+      $text = str_replace($markup, '<span class="chord"><span class="chord-text '. $class .'"></span></span>', $text);
+      $style .= ".chord-text.$class:before { content: \"$chord\" }\n";
+    }
+    return "<style>\n$style</style>\n$text";
+  }
+  else {
+    return $text;
+  }
+}

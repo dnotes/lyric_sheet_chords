@@ -10,11 +10,14 @@ span.chord span {
   display:none;
 }
 
-span.chord span.chord-text {
-  font-size: smaller;
+span.chord span.chord-text,
+span.chord span.chord-text:before {
   font-weight: bold;
   color: green;
   position: absolute;
   display:block;
 }
 
+span.chord span.chord-text { font-size: smaller; top:2px; }
+
+span.chord span.G:before {content: "G";}
