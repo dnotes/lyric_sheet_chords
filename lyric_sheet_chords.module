@@ -39,11 +39,13 @@ function lyric_sheet_chords_filter($op, $delta = 0, $format = -1, $text = '') {
     case 'process':
       drupal_add_css(drupal_get_path('module', 'lyric_sheet_chords') . '/lyric_sheet_chords.css');
       if (variable_get('lyric_sheet_chords_copy', TRUE)) {
-        if (variable_get('lyric_sheet_chords_remove', TRUE)) {
+        $count = 0;
+        $output = preg_replace("|\[([A-G][-\+MADSmajinorsudimg /#b1-9]*/*[A-G1-9]*)\]|", '<span class="chord"><span> [</span><span class="chord-text">$1</span><span>] </span></span>', $text, -1, $count);
+        if (variable_get('lyric_sheet_chords_remove', TRUE) && $count) {
           drupal_add_js(drupal_get_path('module', 'lyric_sheet_chords') . '/lyric_sheet_chords.js', 'module', 'footer');
-          $output = '<div class="remove-chords"><a class="remove-chords" href="#">' . t('remove chords') . '</a></div>';
+          $output = '<div class="remove-chords"><a class="remove-chords" href="#">' . t('remove chords') . '</a></div>' . $output;
         }
-        return  $output . preg_replace("|\[([A-G][-\+MADSmajinorsudimg /#b1-9]*/*[A-G1-9]*)\]|", '<span class="chord"><span> [</span><span class="chord-text">$1</span><span>] </span></span>', $text);
+        return $output;
       }
       else {
         return _lyric_sheet_chords_render($text);
