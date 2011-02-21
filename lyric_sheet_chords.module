@@ -20,19 +20,30 @@ function lyric_sheet_chords_filter($op, $delta = 0, $format = -1, $text = '') {
     case 'prepare':
       return $text;
     case 'settings':
-      $form['lyric_sheet_chords_copy'] = array(
+//      $form['lyric_sheet_chords_copy'] = array(
+//        '#type' => 'checkbox',
+//        '#title' => t('Copy chords with text'),
+//        '#description' => t('When copying text from the browser, the chords will appear inline with the text.
+//          The benefit of this is that the chords are kept, but in many cases they do not make sense in context, for example
+//          when a chord appears in the middle of a word.  Also, copying from webkit browsers can be wonky.
+//          HOWEVER: disabling this does not at present work in IE.'),
+//        '#default_value' => variable_get('lyric_sheet_chords_copy', TRUE),
+//      );
+      $form['lyric_sheet_chords_remove'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Copy chords with text'),
-        '#description' => t('When copying text from the browser, the chords will appear inline with the text.
-          The benefit of this is that the chords are kept, but in many cases they do not make sense in context, for example
-          when a chord appears in the middle of a word.  Also, copying from webkit browsers can be wonky.'),
-        '#default_value' => variable_get('lyric_sheet_chords_copy', FALSE),
+        '#title' => t('Insert link to remove chords'),
+        '#description' => t('A javascript "remove chords" button is useful for people who want to copy only the text.'),
+        '#default_value' => variable_get('lyric_sheet_chords_remove', TRUE),
       );
       return $form;
     case 'process':
       drupal_add_css(drupal_get_path('module', 'lyric_sheet_chords') . '/lyric_sheet_chords.css');
-      if (variable_get('lyric_sheet_chords_copy', FALSE)) {
-        return preg_replace("|\[([A-G][-\+MADSmajinorsudimg /#b1-9]*/*[A-G1-9]*)\]|", '<span class="chord"><span> [</span><span class="chord-text">$1</span><span>] </span></span>', $text);
+      if (variable_get('lyric_sheet_chords_copy', TRUE)) {
+        if (variable_get('lyric_sheet_chords_remove', TRUE)) {
+          drupal_add_js(drupal_get_path('module', 'lyric_sheet_chords') . '/lyric_sheet_chords.js', 'module', 'footer');
+          $output = '<div class="remove-chords"><a class="remove-chords" href="#">' . t('remove chords') . '</a></div>';
+        }
+        return  $output . preg_replace("|\[([A-G][-\+MADSmajinorsudimg /#b1-9]*/*[A-G1-9]*)\]|", '<span class="chord"><span> [</span><span class="chord-text">$1</span><span>] </span></span>', $text);
       }
       else {
         return _lyric_sheet_chords_render($text);

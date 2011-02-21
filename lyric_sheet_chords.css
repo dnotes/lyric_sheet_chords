@@ -20,4 +20,9 @@ span.chord span.chord-text:before {
 
 span.chord span.chord-text { font-size: smaller; top:2px; }
 
-span.chord span.G:before {content: "G";}
+div.remove-chords {
+  float:right;
+}
+a.remove-chords {
+  font-size:smaller;
+}
